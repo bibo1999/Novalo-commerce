@@ -71,7 +71,15 @@ export default function Navbar() {
           {/* 1. LEFT: Logo */}
           <div className="flex shrink-0">
             <Link href="/" onClick={closeAll}>
-              <Image className="w-auto h-8 brightness-200" src="/assets/logo.svg" alt="Logo" width={120} height={32} priority />
+              <div className="h-12 w-36 relative">
+                <Image 
+                  src="/assets/logo.svg" 
+                  alt="Logo" 
+                  fill 
+                  className="object-contain brightness-200"
+                  priority 
+                />
+              </div>
             </Link>
           </div>
 
