@@ -1,0 +1,63 @@
+/* Animation for the Trash Icon */
+@keyframes shake {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(5deg); }
+  50% { transform: rotate(0deg); }
+  75% { transform: rotate(-5deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.removeButton:hover .trashIcon {
+  animation: shake 0.2s ease-in-out infinite;
+}
+
+/* Loading Overlay Styles */
+.loadingOverlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(255, 255, 255, 0.7);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(1px);
+  transition: all 0.3s ease;
+  border-radius: inherit; /* Matches parent rounding */
+}
+
+/* Specific Summary Loader */
+.summaryLoader {
+  background-color: rgba(252, 252, 252, 0.7);
+}
+
+/* Quantity Selector pill-style */
+.quantitySelector {
+  display: flex;
+  align-items: center;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background-color: white;
+  height: 40px;
+  width: fit-content;
+  overflow: hidden;
+}
+
+.quantityBtn {
+  width: 32px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  transition: color 0.2s;
+  cursor: pointer;
+}
+
+.quantityBtn:hover:not(:disabled) {
+  color: #12bb9c;
+}
+
+.quantityBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}

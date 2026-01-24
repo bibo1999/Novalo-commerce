@@ -32,14 +32,14 @@ export default function CategorySlider({ categories, isLoading }) {
       {/* Navigation Arrows with cursor-pointer */}
       <button 
         onClick={scrollPrev}
-        className="absolute left-[-20px] top-1/2 -translate-y-1/2 z-20 bg-white shadow-md rounded-full p-2 text-[#001f3f] hover:text-[#12bb9c] transition-colors hidden md:flex items-center justify-center border border-gray-100 cursor-pointer"
+        className="absolute -left-5 top-1/2 -translate-y-1/2 z-20 bg-white shadow-md rounded-full p-2 text-[#001f3f] hover:text-[#12bb9c] transition-colors hidden md:flex items-center justify-center border border-gray-100 cursor-pointer"
       >
         <IoChevronBack size={20} />
       </button>
       
       <button 
         onClick={scrollNext}
-        className="absolute right-[-20px] top-1/2 -translate-y-1/2 z-20 bg-white shadow-md rounded-full p-2 text-[#001f3f] hover:text-[#12bb9c] transition-colors hidden md:flex items-center justify-center border border-gray-100 cursor-pointer"
+        className="absolute -right-5 top-1/2 -translate-y-1/2 z-20 bg-white shadow-md rounded-full p-2 text-[#001f3f] hover:text-[#12bb9c] transition-colors hidden md:flex items-center justify-center border border-gray-100 cursor-pointer"
       >
         <IoChevronForward size={20} />
       </button>

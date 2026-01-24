@@ -4,12 +4,14 @@ import Image from "next/image";
 import Link from "next/link";
 import axios from "axios";
 import { authenticationContext } from "@/context/UserContext";
+import { cartContext } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
 export default function Navbar() {
   const { userData, logOut } = useContext(authenticationContext);
+  const { numOfCartItems, setIsCartOpen } = useContext(cartContext);
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
 
@@ -73,8 +75,8 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* 2. MIDDLE: Center Navigation Links (Hidden on Mobile) */}
-          <div className="hidden lg:flex flex-grow justify-center">
+          {/* 2. MIDDLE: Center Navigation Links (Desktop) */}
+          <div className="hidden lg:flex grow justify-center">
             <ul className="flex items-center gap-10 list-none m-0 p-0">
               <li><Link href="/" className="text-[13px] uppercase tracking-wider font-semibold hover:text-[#12bb9c] transition">Home</Link></li>
               <li><Link href="/products" className="text-[13px] uppercase tracking-wider font-semibold hover:text-[#12bb9c] transition">Products</Link></li>
@@ -87,23 +89,25 @@ export default function Navbar() {
             </ul>
           </div>
 
-          {/* 3. RIGHT: Icons */}
+          {/* 3. RIGHT: Icons & Mobile Toggle */}
           <div className="flex items-center space-x-2 shrink-0">
+            
             {/* Cart Icon */}
             <div className="relative">
-              <button onClick={() => toggleMenu('cart')} className="inline-flex items-center p-2 hover:bg-white/10 rounded-lg transition-colors text-sm font-medium">
-                <svg className="w-5 h-5 lg:me-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+              <button 
+                onClick={() => setIsCartOpen(true)} 
+                className="relative cursor-pointer inline-flex items-center p-2 hover:bg-white/10 rounded-lg transition-colors text-sm font-medium"
+              >
+                <svg className="w-5 h-5 lg:me-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
                 <span className="hidden sm:inline">My Cart</span>
+                {numOfCartItems > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-[#12bb9c] text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#001f3f]">
+                    {numOfCartItems}
+                  </span>
+                )}
               </button>
-              {activeMenu === 'cart' && (
-                <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl py-2 text-gray-800 z-50 border border-gray-200">
-                  <div className="px-4 py-2 font-bold border-b text-[#001f3f]">Cart Summary</div>
-                  <div className="p-8 text-center text-sm text-gray-400">Your cart is empty</div>
-                  <div className="px-2 pb-1">
-                    <Link href="/cart" onClick={closeAll} className="block text-center bg-[#12bb9c] text-white py-2 rounded font-semibold hover:opacity-90 transition">View Cart</Link>
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* User Icon */}
@@ -131,7 +135,7 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Hamburger Button */}
+            {/* Hamburger Button (Mobile Only) */}
             <button onClick={() => toggleMenu('mobile')} className="lg:hidden p-2 hover:bg-white/10 rounded-md transition">
                 <i className={`fa-solid ${activeMenu === 'mobile' ? 'fa-xmark' : 'fa-bars'} text-xl`}></i>
             </button>
@@ -158,7 +162,7 @@ export default function Navbar() {
         {/* MEGA MENU OVERLAY (Desktop Only) */}
         {activeMenu === 'categories' && (
           <div className="absolute left-0 top-full w-full bg-white text-gray-800 shadow-2xl border-t border-gray-100 hidden lg:block" onMouseLeave={closeAll}>
-            <div className="max-w-screen-xl mx-auto grid grid-cols-12 min-h-[380px]">
+            <div className="max-w-screen-xl mx-auto grid grid-cols-12 min-h-95">
               <div className="col-span-3 border-r border-gray-100 p-6 bg-gray-50/50">
                 <h3 className="font-bold text-[#001f3f] text-[11px] uppercase mb-4 tracking-widest opacity-60">Categories</h3>
                 <div className="space-y-1">
@@ -185,9 +189,9 @@ export default function Navbar() {
               </div>
 
               <div className="col-span-4 p-8 flex items-center justify-center">
-                <Link href={`/categories/${hoveredCategory?._id}`} onClick={closeAll} className="relative w-full h-[280px] group/img overflow-hidden rounded-2xl shadow-lg">
+                <Link href={`/categories/${hoveredCategory?._id}`} onClick={closeAll} className="relative w-full h-70 group/img overflow-hidden rounded-2xl shadow-lg">
                   <Image src={hoveredCategory?.image || '/placeholder.png'} fill className="object-cover transition-transform duration-500 group-hover/img:scale-110" alt="category visual" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#001f3f]/80 to-transparent flex flex-col justify-end p-6">
+                  <div className="absolute inset-0 bg-linear-to-t from-[#001f3f]/80 to-transparent flex flex-col justify-end p-6">
                     <span className="text-white text-xs uppercase tracking-[0.2em] font-bold mb-1 opacity-80">Explore</span>
                     <h4 className="text-white font-bold text-xl">{hoveredCategory?.name}</h4>
                   </div>

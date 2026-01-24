@@ -1,8 +1,11 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import Navbar from "@/components/Navbar/Navbar";
 import Footer from "@/components/Footer/Footer";
-import { AuthenticationContextProvider } from "@/context/UserContext"; // Import from the new file
+import { AuthenticationContextProvider } from "@/context/UserContext";
 import "./globals.css";
+import { CartContextProvider } from "@/context/CartContext";
+import CartDrawer from "@/components/CartDrawer/CartDrawer";
+import { Toaster } from "react-hot-toast"; 
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
@@ -12,7 +15,6 @@ export const metadata = {
   description: "E-commerce platform built with Next.js",
 };
 
-// This is the "Default Export" Next.js is looking for!
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
@@ -21,11 +23,34 @@ export default function RootLayout({ children }) {
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <AuthenticationContextProvider>
-          <Navbar /> 
-          <main className="min-h-screen pt-20">
-            {children}
-          </main>
-          <Footer />
+          <CartContextProvider>
+            <Navbar /> 
+            <CartDrawer />
+            <main className="min-h-screen pt-20">
+              {children}
+            </main>
+            <Footer />
+            
+            {/* Toaster */}
+            <Toaster 
+              position="top-center"
+              reverseOrder={false}
+              toastOptions={{
+                duration: 4000,
+                style: {
+                  background: '#1f2937',
+                  color: '#fff',
+                  borderRadius: '10px',
+                },
+                success: {
+                  iconTheme: {
+                    primary: '#12bb9c', 
+                    secondary: '#fff',
+                  },
+                },
+              }}
+            />
+          </CartContextProvider>
         </AuthenticationContextProvider>
       </body>
     </html>

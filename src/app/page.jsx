@@ -105,7 +105,7 @@ export default function Home() {
           <div className="flex flex-col mb-8">
             <h2 className="text-3xl md:text-4xl font-serif font-light text-[#001f3f] relative inline-block">
               Shop by Category
-              <span className="absolute bottom-0 left-0 w-20 h-[2px] bg-[#12bb9c] mt-2"></span>
+              <span className="absolute bottom-0 left-0 w-20 h-0.5 bg-[#12bb9c] mt-2"></span>
             </h2>
             {isLoading && <Skeleton width={150} height={4} className="mt-4" baseColor="#12bb9c20" highlightColor="#12bb9c" />}
           </div>
@@ -117,7 +117,7 @@ export default function Home() {
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-3xl md:text-4xl font-serif font-light text-[#001f3f] relative inline-block">
               Our Best Sellers
-              <span className="absolute bottom-0 left-0 w-20 h-[2px] bg-[#12bb9c] mt-2"></span>
+              <span className="absolute bottom-0 left-0 w-20 h-0.5 bg-[#12bb9c] mt-2"></span>
             </h2>
           </div>
           <FeaturedProducts products={bestSellers} isLoading={isLoading} />
@@ -127,7 +127,7 @@ export default function Home() {
         <section className="py-16 md:py-24 animate-on-scroll opacity-0 translate-y-8 transition-all duration-1000 ease-out delay-300">
           <h2 className="text-3xl md:text-4xl font-serif font-light mb-10 text-[#001f3f] relative inline-block">
             Discover More
-            <span className="absolute bottom-0 left-0 w-20 h-[2px] bg-[#12bb9c] mt-2"></span>
+            <span className="absolute bottom-0 left-0 w-20 h-0.5 bg-[#12bb9c] mt-2"></span>
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
             {isLoading ? (
