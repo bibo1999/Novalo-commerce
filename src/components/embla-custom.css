@@ -3,6 +3,7 @@
   overflow: hidden;
   position: relative;
   cursor: grab;
+  height: 100%; 
 }
 
 .embla:active {
@@ -12,6 +13,7 @@
 .embla__container {
   display: flex;
   flex-direction: row;
+  height: 100%;
   backface-visibility: hidden;
   touch-action: pan-y;
 }
@@ -19,6 +21,13 @@
 .embla__slide {
   min-width: 0;
   position: relative;
+  height: 100%;
+}
+
+@media (max-width: 640px) {
+  .embla__container {
+    border-radius: 16px;
+  }
 }
 
 /* Category Slider Responsive Widths */

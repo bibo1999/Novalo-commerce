@@ -1,33 +1,60 @@
 'use client';
 
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { authenticationContext } from '@/context/UserContext';
 import toast from 'react-hot-toast';
+import Cookies from 'js-cookie';
 
 export default function Login() {
-    let { loginApi, setUserData } = useContext(authenticationContext);
+    let { loginApi, setUserData, userData } = useContext(authenticationContext);
     let router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
     const [messageError, setMessageError] = useState('');
 
+    // Best Practice: If user is already logged in, redirect them away from /login immediately
+    useEffect(() => {
+        if (userData || Cookies.get('userToken')) {
+            router.replace('/');
+        }
+    }, [userData, router]);
+
     async function handleLogin(values) {
         setIsLoading(true);
-        let res = await loginApi(values);
+        setMessageError(''); // Clear errors before new attempt
         
-        if (res?.data?.message === 'success') {
-            localStorage.setItem('userToken', res?.data.token);
-            setUserData(res?.data.token); 
-            toast.success("Welcome Back! 😍", { duration: 2000 });
-            router.push('/');
-        } else {
-            const errorMsg = res?.response?.data?.message || "Invalid email or password";
-            setMessageError(errorMsg);
+        try {
+            let res = await loginApi(values);
+            
+            if (res?.data?.message === 'success') {
+                const token = res?.data.token;
+
+                // 1. Set Cookie for Middleware (Crucial for Best Practice)
+                Cookies.set('userToken', token, { expires: 7, secure: true, sameSite: 'strict' });
+                
+                // 2. Set LocalStorage for existing persistence logic
+                localStorage.setItem('userToken', token);
+                
+                // 3. Update Context State
+                setUserData(token); 
+                
+                toast.success("Welcome Back! 😍", { duration: 3000 });
+                
+                // 4. Use replace instead of push to prevent going 'back' to login
+                router.replace('/');
+            } else {
+                const errorMsg = res?.response?.data?.message || "Invalid email or password";
+                setMessageError(errorMsg);
+                toast.error(errorMsg);
+            }
+        } catch (error) {
+            setMessageError("Something went wrong. Please try again.");
+        } finally {
+            setIsLoading(false);
         }
-        setIsLoading(false);
     }
 
     let validation = Yup.object({
@@ -41,15 +68,14 @@ export default function Login() {
         onSubmit: handleLogin,
     });
 
-    // Helper to determine if field is invalid
     const isFieldInvalid = (fieldName) => 
         formik.errors[fieldName] && (formik.touched[fieldName] || formik.submitCount > 0);
 
     return (
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-12">
+        <div className="min-h-screen bg-[#f9f8f4] flex items-center justify-center px-4 py-12">
             <form 
                 onSubmit={formik.handleSubmit}
-                className="max-w-md w-full bg-white border border-gray-200 rounded-2xl p-8 shadow-xl space-y-8"
+                className="max-w-md w-full bg-white border border-gray-100 rounded-3xl p-10 shadow-2xl space-y-8"
             >
                 <div className="text-center">
                     <h2 className="text-3xl font-bold text-[#001f3f]">Login Now</h2>
@@ -57,7 +83,7 @@ export default function Login() {
                 </div>
 
                 {messageError && (
-                    <div className="flex items-center bg-red-50 border-l-4 border-red-600 text-red-700 p-4 rounded-md">
+                    <div className="flex items-center bg-red-50 border-l-4 border-red-600 text-red-700 p-4 rounded-xl animate-pulse">
                         <i className="fa-solid fa-circle-exclamation mr-3"></i>
                         <p className="text-sm font-bold">{messageError}</p>
                     </div>
@@ -111,8 +137,8 @@ export default function Login() {
                     </div>
                 </div>
 
-                <div className="flex items-center justify-between">
-                    <Link href="/forget-password" size="sm" className="text-sm font-medium text-[#12bb9c] hover:opacity-80 no-underline">
+                <div className="flex items-center justify-end">
+                    <Link href="/forget-password" size="sm" className="text-sm font-medium text-[#12bb9c] hover:opacity-80 transition-opacity">
                         Forgot Password?
                     </Link>
                 </div>
@@ -120,14 +146,18 @@ export default function Login() {
                 <button 
                     disabled={isLoading} 
                     type="submit" 
-                    className={`w-full py-3 rounded-xl text-white font-bold text-sm transition-all duration-300 shadow-lg
-                        ${isLoading ? 'bg-gray-400' : 'bg-[#001f3f] hover:bg-[#002d5c] active:scale-95 shadow-[#001f3f]/20'}`}
+                    className={`cursor-pointer w-full py-4 rounded-2xl text-white font-bold text-sm transition-all duration-300 shadow-xl
+                        ${isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#001f3f] hover:bg-[#002d5c] active:scale-[0.98] shadow-[#001f3f]/20'}`}
                 >
-                    {isLoading ? <i className='fas fa-spinner fa-spin'></i> : "Login"}
+                    {isLoading ? (
+                        <span className="flex items-center justify-center gap-2">
+                            <i className='fas fa-circle-notch fa-spin'></i> Authenticaring...
+                        </span>
+                    ) : "Login"}
                 </button>
 
                 <p className="text-center text-sm text-gray-600">
-                    New here? <Link href="/register" className="text-[#12bb9c] font-bold no-underline hover:underline">Create an account</Link>
+                    New here? <Link href="/register" className="text-[#12bb9c] font-bold hover:underline ml-1">Create an account</Link>
                 </p>
             </form>
         </div>

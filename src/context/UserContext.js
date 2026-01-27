@@ -1,6 +1,7 @@
 'use client';
 import { createContext, useState, useEffect } from "react";
 import axios from "axios";
+import Cookies from "js-cookie"; 
 
 export const authenticationContext = createContext(); 
 
@@ -8,26 +9,26 @@ export function AuthenticationContextProvider({ children }) {
     const [userData, setUserData] = useState(null);
 
     useEffect(() => {
-        const token = localStorage.getItem('userToken');
-        if (typeof window !== 'undefined' && localStorage.getItem('userToken')) {
-            setUserData(localStorage.getItem('userToken'));
+        const token = Cookies.get('userToken');
+        if (token) {
+            setUserData(token);
         }
     }, []);
-    // Login
+
     async function loginApi(values) {
-        return axios.post(`https://ecommerce.routemisr.com/api/v1/auth/signin`, values)
-            .then((res) => res).catch((err) => err);
+        return axios.post(`https://ecommerce.routemisr.com/api/v1/auth/signin`, values);
     }
-    // Register
+
     async function registerApi(values){
-      return axios.post(`https://ecommerce.routemisr.com/api/v1/auth/signup`, values)
-        .then((res) => res).catch((err) => err);
+        return axios.post(`https://ecommerce.routemisr.com/api/v1/auth/signup`, values);
     }
-    // Logout
+
     function logOut() {
-    localStorage.removeItem('userToken');
-    setUserData(null);
-}
+        Cookies.remove('userToken');
+        localStorage.removeItem('userToken');
+        setUserData(null);
+        window.location.href = '/login'; 
+    }
 
     return (
         <authenticationContext.Provider value={{ loginApi, registerApi, userData, setUserData, logOut }}>

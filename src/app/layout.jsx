@@ -27,12 +27,13 @@ export default function RootLayout({ children }) {
           <CartContextProvider>
             <Navbar /> 
             <CartDrawer />
+            
             <main className="min-h-screen pt-20">
               {children}
             </main>
+            
             <Footer />
             
-            {/* Toaster */}
             <Toaster 
               position="top-center"
               reverseOrder={false}
