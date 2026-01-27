@@ -15,16 +15,17 @@ export default function Login() {
     const [isLoading, setIsLoading] = useState(false);
     const [messageError, setMessageError] = useState('');
 
-    // Best Practice: If user is already logged in, redirect them away from /login immediately
     useEffect(() => {
-        if (userData || Cookies.get('userToken')) {
+        // Updated logic: Combined check for faster client-side redirection if already authed
+        const token = Cookies.get('userToken') || (typeof window !== 'undefined' && localStorage.getItem('userToken'));
+        if (userData || token) {
             router.replace('/');
         }
     }, [userData, router]);
 
     async function handleLogin(values) {
         setIsLoading(true);
-        setMessageError(''); // Clear errors before new attempt
+        setMessageError(''); 
         
         try {
             let res = await loginApi(values);
@@ -32,19 +33,25 @@ export default function Login() {
             if (res?.data?.message === 'success') {
                 const token = res?.data.token;
 
-                // 1. Set Cookie for Middleware (Crucial for Best Practice)
-                Cookies.set('userToken', token, { expires: 7, secure: true, sameSite: 'strict' });
+                // 1. Set Cookie with production security flags (Necessary for Middleware)
+                Cookies.set('userToken', token, { 
+                    expires: 7, 
+                    secure: true, 
+                    sameSite: 'strict' 
+                });
                 
-                // 2. Set LocalStorage for existing persistence logic
+                // 2. Sync LocalStorage and Context
                 localStorage.setItem('userToken', token);
-                
-                // 3. Update Context State
                 setUserData(token); 
                 
                 toast.success("Welcome Back! 😍", { duration: 3000 });
                 
-                // 4. Use replace instead of push to prevent going 'back' to login
-                router.replace('/');
+                // 3. LOGIC CHANGE: Hard redirect using window.location.href
+                // This ensures the live server middleware registers the new cookie immediately.
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 500);
+
             } else {
                 const errorMsg = res?.response?.data?.message || "Invalid email or password";
                 setMessageError(errorMsg);
