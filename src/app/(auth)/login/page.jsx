@@ -16,9 +16,7 @@ export default function Login() {
     const [messageError, setMessageError] = useState('');
 
     useEffect(() => {
-        // Updated logic: Combined check for faster client-side redirection if already authed
-        const token = Cookies.get('userToken') || (typeof window !== 'undefined' && localStorage.getItem('userToken'));
-        if (userData || token) {
+        if (userData || Cookies.get('userToken')) {
             router.replace('/');
         }
     }, [userData, router]);
@@ -33,24 +31,27 @@ export default function Login() {
             if (res?.data?.message === 'success') {
                 const token = res?.data.token;
 
-                // 1. Set Cookie with production security flags (Necessary for Middleware)
+                // 1. Set Cookie (Vital for Middleware)
+                // Added path: '/' to ensure it's available everywhere immediately
                 Cookies.set('userToken', token, { 
                     expires: 7, 
                     secure: true, 
-                    sameSite: 'strict' 
+                    sameSite: 'strict',
+                    path: '/' 
                 });
                 
-                // 2. Sync LocalStorage and Context
+                // 2. Set LocalStorage and Context
                 localStorage.setItem('userToken', token);
                 setUserData(token); 
                 
                 toast.success("Welcome Back! 😍", { duration: 3000 });
                 
-                // 3. LOGIC CHANGE: Hard redirect using window.location.href
-                // This ensures the live server middleware registers the new cookie immediately.
+                // 3. LOGIC CHANGE: 
+                // We use window.location.href instead of router.replace.
+                // This forces the browser to sync the cookie with the server.
                 setTimeout(() => {
-                    window.location.href = '/';
-                }, 500);
+                    window.location.href = '/'; 
+                }, 400); 
 
             } else {
                 const errorMsg = res?.response?.data?.message || "Invalid email or password";
@@ -97,7 +98,6 @@ export default function Login() {
                 )}
 
                 <div className="space-y-6">
-                    {/* Email Input */}
                     <div className="relative z-0 w-full group">
                         <input 
                             type="email" name="email" id="email"
@@ -120,7 +120,6 @@ export default function Login() {
                         )}
                     </div>
 
-                    {/* Password Input */}
                     <div className="relative z-0 w-full group">
                         <input 
                             type="password" name="password" id="password"
