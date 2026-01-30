@@ -9,7 +9,7 @@ import ProductCard from '@/components/ProductCard/ProductCard';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
-export default function ProductsPage() {
+export default function AllProducts() {
     const [viewMode, setViewMode] = useState('grid');
     const [products, setProducts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);

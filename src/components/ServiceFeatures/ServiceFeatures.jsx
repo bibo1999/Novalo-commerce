@@ -35,7 +35,7 @@ export default function ServiceFeatures() {
             className="group flex items-start md:flex-col gap-4 p-5 md:p-0 rounded-2xl bg-white md:bg-transparent border border-slate-50 md:border-none shadow-sm md:shadow-none transition-all duration-300 hover:shadow-md"
           >
             {/* Icon Container with subtle background on mobile */}
-            <div className="flex-shrink-0 w-12 h-12 md:w-auto md:h-auto flex items-center justify-center rounded-xl bg-[#12bb9c]/10 md:bg-transparent">
+            <div className="shrink-0 w-12 h-12 md:w-auto md:h-auto flex items-center justify-center rounded-xl bg-[#12bb9c]/10 md:bg-transparent">
               <f.icon className="text-2xl md:text-4xl text-[#12bb9c] transition-transform duration-300 group-hover:scale-110" />
             </div>
 

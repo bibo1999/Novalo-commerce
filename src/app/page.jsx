@@ -19,6 +19,8 @@ import ServiceFeatures from "@/components/ServiceFeatures/ServiceFeatures";
 import CountdownTimer from "@/components/CountdownTimer/CountdownTimer";
 
 export default function Home() {
+
+  
   const { addToCart, setIsCartOpen } = useContext(cartContext);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
