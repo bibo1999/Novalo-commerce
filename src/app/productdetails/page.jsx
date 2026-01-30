@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, Suspense } from 'react'; 
 import axios from 'axios';
 import { useSearchParams } from 'next/navigation'; 
 import { HiOutlineViewGrid, HiOutlineViewList, HiChevronRight } from "react-icons/hi";
@@ -10,9 +10,10 @@ import ProductCard from '@/components/ProductCard/ProductCard';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
-export default function AllProducts() {
+
+function AllProductsContent() {
     const searchParams = useSearchParams();
-    const subCategoryId = searchParams.get('sub'); // Here we Capture the sub-category ID from Navbar link
+    const subCategoryId = searchParams.get('sub');
 
     const [viewMode, setViewMode] = useState('grid');
     const [products, setProducts] = useState([]);
@@ -45,7 +46,7 @@ export default function AllProducts() {
         } finally {
             setIsLoading(false);
         }
-    }, [currentPage, sortOrder, selectedCategory, maxPrice, subCategoryId]); // subCategoryId dependancy
+    }, [currentPage, sortOrder, selectedCategory, maxPrice, subCategoryId]);
 
     useEffect(() => {
         fetchProducts();
@@ -160,7 +161,6 @@ export default function AllProducts() {
                                         <ProductCard key={item._id} product={item} viewMode={viewMode} />
                                     ))
                                 ) : (
-                                    /* THE EMPTY Results */
                                     <div className="text-center py-20 px-4 border-2 border-dashed border-gray-800 rounded-3xl">
                                         <p className="text-gray-500 font-bold uppercase tracking-widest">No matching items found.</p>
                                         <button 
@@ -196,5 +196,18 @@ export default function AllProducts() {
                 </div>
             </div>
         </div>
+    );
+}
+
+// 2. Export the component wrapped in Suspense
+export default function AllProducts() {
+    return (
+        <Suspense fallback={
+            <div className="bg-[#0f172a] min-h-screen pt-28 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#12bb9c]"></div>
+            </div>
+        }>
+            <AllProductsContent />
+        </Suspense>
     );
 }
