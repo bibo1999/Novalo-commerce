@@ -8,7 +8,7 @@ import { AiFillStar } from 'react-icons/ai';
 import { HiOutlineShoppingCart } from 'react-icons/hi';
 import { ImSpinner2 } from 'react-icons/im';
 
-export default function ProductCard({ product, isBestSeller }) {
+export default function ProductCard({ product, isBestSeller, Timer }) {
   const { addToCart, setIsCartOpen } = useContext(cartContext);
   const [isAdding, setIsAdding] = useState(false);
 
@@ -43,7 +43,7 @@ export default function ProductCard({ product, isBestSeller }) {
         </div>
       </Link>
 
-      <div className="flex flex-col flex-grow">
+      <div className="flex flex-col grow">
         <div className="flex items-center space-x-2 mb-2">
           <div className="flex items-center text-yellow-400">
             {[...Array(5)].map((_, i) => (
@@ -63,6 +63,7 @@ export default function ProductCard({ product, isBestSeller }) {
         </Link>
 
         <div className="mt-auto pt-4">
+          {Timer}
           <div className="text-lg font-black text-[#001f3f] mb-3">EGP {product.price}</div>
           <button 
             disabled={isAdding}

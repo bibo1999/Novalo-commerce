@@ -13,6 +13,13 @@ export function CartContextProvider({ children }) {
     const [numOfFavoriteItems, setNumOfFavoriteItems] = useState(0);
     const [wishListDetails, setWishListDetails] = useState([]);
 
+    // Clear Cart after checkout
+    const clearCartState = () => {
+    setCartDetails(null);
+    setNumOfCartItems(0);
+    setCartId(null);
+    };
+
     
     const getHeaders = () => ({
         token: typeof window !== 'undefined' ? localStorage.getItem('userToken') : '',
@@ -128,7 +135,7 @@ export function CartContextProvider({ children }) {
     }
 
     // --- 2. FUNCTIONS ---
-
+    
     async function refreshCart() {
         const token = typeof window !== 'undefined' ? localStorage.getItem('userToken') : null;
         if (!token) return;
@@ -144,10 +151,7 @@ export function CartContextProvider({ children }) {
             console.error("Cart sync failed", error);
         }
     }
-
-    useEffect(() => {
-        refreshCart();
-    }, []);
+    
 
     // --- 3. PAYMENT & WISHLIST ---
 
@@ -156,14 +160,24 @@ export function CartContextProvider({ children }) {
         return axios.post(`https://ecommerce.routemisr.com/api/v1/orders/checkout-session/${cartId}?url=${url}`,
             { shippingAddress },
             { headers: getHeaders() }
-        ).then((res) => res).catch((error) => error);
+        ).then((res) => {
+        if (res?.data?.status === 'success') {
+            clearCartState(); 
+        }
+        return res;
+    }).catch((error) => error);
     }
 
     async function cashPayment(cartId, shippingAddress) {
         return axios.post(`https://ecommerce.routemisr.com/api/v1/orders/${cartId}`,
             { shippingAddress },
             { headers: getHeaders() }
-        ).then((res) => res).catch((error) => error);
+        ).then((res) => {
+        if (res?.data?.status === 'success') {
+            clearCartState(); 
+        }
+        return res;
+    }).catch((error) => error);
     }
 
     async function getLoggedWishList() {

@@ -16,6 +16,7 @@ import CategorySlider from "@/components/CategorySlider/CategorySlider";
 import FeaturedProducts from "@/components/FeaturedProducts/FeaturedProducts";
 import ProductCard from "@/components/ProductCard/ProductCard";
 import ServiceFeatures from "@/components/ServiceFeatures/ServiceFeatures";
+import CountdownTimer from "@/components/CountdownTimer/CountdownTimer";
 
 export default function Home() {
   const { addToCart, setIsCartOpen } = useContext(cartContext);
@@ -149,21 +150,28 @@ export default function Home() {
             
             {/* Mobile Progress Indicator (Visible on mobile only) */}
             <div className="flex md:hidden items-center gap-3">
-              <span className="text-xs font-bold text-[#001f3f]">0{Math.min(activeIndex + 1, 3)}</span>
+              <span className="text-xs font-bold text-[#001f3f]">0{Math.min(activeIndex + 1, 4)}</span>
               <div className="w-16 h-0.5 bg-slate-200 relative overflow-hidden">
                 <div 
                   className="absolute top-0 left-0 h-full bg-[#12bb9c] transition-all duration-300"
-                  style={{ width: `${((Math.min(activeIndex + 1, 3)) / 3) * 100}%` }}
+                  style={{ width: `${((Math.min(activeIndex + 1, 4)) / 4) * 100}%` }}
                 ></div>
               </div>
-              <span className="text-xs font-bold text-slate-300">03</span>
+              <span className="text-xs font-bold text-slate-300">04</span>
             </div>
 
             {/* Desktop Static Version */}
-            <div className="hidden md:flex items-center gap-2">
-              <span className="text-xs font-bold text-[#001f3f]">01</span>
-              <div className="w-12 h-0.5 bg-[#12bb9c]"></div>
-              <span className="text-xs font-bold text-slate-300">03</span>
+            <div className="hidden md:flex flex-col items-end gap-1">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-black uppercase tracking-widest text-[#12bb9c]">
+                  Exclusive Deals
+                </span>
+                <div className="w-8 h-px bg-[#12bb9c]"></div>
+                <span className="text-xs font-bold text-[#001f3f]">Three Products</span>
+              </div>
+              <p className="text-[9px] text-slate-400 font-medium">
+                Limited time offers for The upcoming 2 month
+              </p>
             </div>
           </div>
 
@@ -190,12 +198,32 @@ export default function Home() {
             </div>
 
             {/* Product Mapping */}
-            {isLoading ? [...Array(3)].map((_, i) => <div key={i} className="shrink-0 w-[85%] lg:w-full"><Skeleton height={450} borderRadius={24} /></div>) : 
+            {isLoading ?
+            ( [...Array(3)].map((_, i) => (
+            <div key={i} className="shrink-0 w-[85%] lg:w-full">
+              <Skeleton height={450} borderRadius={24} />
+              </div>)) 
+              ) : ( 
               dailySells.map((product) => (
-              <div key={product._id} className="shrink-0 w-[85%] lg:w-full snap-center">
-                <ProductCard product={product} />
-              </div>
-            ))}
+              <div 
+              key={product._id} 
+              className="shrink-0 w-[85%] lg:w-full snap-center">
+                {/* ProductCard */}
+                <ProductCard 
+                product={product}
+                Timer={
+                <div className="bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase text-center mb-1">
+                        Flash Sale Ends In:
+                    </p>
+                    <CountdownTimer targetDate="2026-03-20T23:59:59" />
+                </div>
+
+                }
+                />
+                </div>
+            ))
+            )}
           </div>
 
           {/* Mobile Dot Indicators */}
