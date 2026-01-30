@@ -104,7 +104,7 @@ export default function Navbar() {
               </li>
               <li>
                 <Link
-                  href="/products"
+                  href="/productdetails"
                   className="text-[13px] uppercase tracking-wider font-semibold hover:text-[#12bb9c] transition"
                 >
                   Products
@@ -265,7 +265,7 @@ export default function Navbar() {
             </li>
             <li>
               <Link
-                href="/products"
+                href="/productdetails"
                 onClick={closeAll}
                 className="block text-lg font-medium hover:text-[#12bb9c]"
               >
@@ -344,7 +344,7 @@ export default function Navbar() {
 
               <div className="col-span-5 p-8">
                 <h3 className="font-bold text-[#001f3f] text-[11px] uppercase mb-6 tracking-widest opacity-60">
-                  {hoveredCategory?.name} Brands
+                  {hoveredCategory?.name} Sub-category
                 </h3>
                 {isSubLoading ? (
                   <Skeleton count={8} height={22} className="mb-2" />
@@ -354,7 +354,7 @@ export default function Navbar() {
                       subCategories.map((sub) => (
                         <Link
                           key={sub._id}
-                          href={`/products?sub=${sub._id}`}
+                          href={`/productdetails?sub=${sub._id}`}
                           onClick={closeAll}
                           className="text-sm text-gray-500 hover:text-[#12bb9c] transition-colors flex items-center gap-2"
                         >

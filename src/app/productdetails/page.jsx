@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import { useSearchParams } from 'next/navigation'; 
 import { HiOutlineViewGrid, HiOutlineViewList, HiChevronRight } from "react-icons/hi";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import SidebarFilters from '@/components/Products/SidebarFilters';
@@ -10,6 +11,9 @@ import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
 export default function AllProducts() {
+    const searchParams = useSearchParams();
+    const subCategoryId = searchParams.get('sub'); // Here we Capture the sub-category ID from Navbar link
+
     const [viewMode, setViewMode] = useState('grid');
     const [products, setProducts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -21,7 +25,6 @@ export default function AllProducts() {
     const [selectedCategory, setSelectedCategory] = useState('');
     const [maxPrice, setMaxPrice] = useState(50000);
 
-    // Prevent re-fetching on every render
     const fetchProducts = useCallback(async () => {
         setIsLoading(true);
         try {
@@ -31,7 +34,7 @@ export default function AllProducts() {
                     limit: 12,
                     sort: sortOrder,
                     "price[lte]": maxPrice,
-                    ...(selectedCategory && { 'category[in]': selectedCategory })
+                    ...(subCategoryId ? { 'subcategory[in]': subCategoryId } : (selectedCategory && { 'category[in]': selectedCategory }))
                 }
             });
             setProducts(data.data);
@@ -42,12 +45,12 @@ export default function AllProducts() {
         } finally {
             setIsLoading(false);
         }
-    }, [currentPage, sortOrder, selectedCategory, maxPrice]);
+    }, [currentPage, sortOrder, selectedCategory, maxPrice, subCategoryId]); // subCategoryId dependancy
 
     useEffect(() => {
         fetchProducts();
     }, [fetchProducts]);
-    // Append background color to override the body color
+
     useEffect(() => {
         const originalStyle = window.getComputedStyle(document.body).backgroundColor;
         document.body.style.backgroundColor = "#0f172a";
@@ -71,12 +74,20 @@ export default function AllProducts() {
                     <span className="hover:text-[#12bb9c] transition-colors cursor-pointer">Home</span>
                     <HiChevronRight className="text-gray-600" />
                     <span className="text-white">All Products</span>
+                    {subCategoryId && (
+                        <>
+                            <HiChevronRight className="text-gray-600" />
+                            <span className="text-[#12bb9c]">Filtered Results</span>
+                        </>
+                    )}
                 </nav>
 
                 {/* header banner */}
                 <div className="w-full bg-[#1e293b] rounded-3xl p-10 mb-10 border border-gray-700/50 relative overflow-hidden">
                     <div className="relative z-10">
-                        <h1 className="text-4xl font-black mb-2 uppercase tracking-tight">Store Catalog</h1>
+                        <h1 className="text-4xl font-black mb-2 uppercase tracking-tight">
+                            {subCategoryId ? "Sub-Category Results" : "Store Catalog"}
+                        </h1>
                         <p className="text-gray-400 max-w-md">Browse our latest premium arrivals and exclusive tech gear.</p>
                     </div>
                     <div className="absolute top-0 right-0 w-64 h-64 bg-[#12bb9c]/10 blur-[100px] rounded-full -mr-20 -mt-20"></div>
@@ -98,6 +109,14 @@ export default function AllProducts() {
                             </p>
 
                             <div className="flex items-center gap-4">
+                                {subCategoryId && (
+                                    <button 
+                                        onClick={() => window.location.href = '/productdetails'}
+                                        className="text-xs cursor-pointer bg-[#12bb9c]/10 text-[#12bb9c] px-3 py-1 rounded-full border border-[#12bb9c]/30 hover:bg-[#12bb9c]/20 transition"
+                                    >
+                                        Clear Sub-category ✕
+                                    </button>
+                                )}
                                 <div className="hidden md:flex bg-gray-900/50 rounded-xl p-1 border border-gray-700/50">
                                     <button onClick={() => setViewMode('grid')} 
                                         className={`p-2 rounded-lg transition-all cursor-pointer ${viewMode === 'grid' ? 'bg-[#12bb9c] text-white shadow-lg' : 'text-gray-500 hover:text-gray-300'}`}>
@@ -110,7 +129,7 @@ export default function AllProducts() {
                                 </div>
 
                                 <Select value={sortOrder} onValueChange={(val) => { setSortOrder(val); setCurrentPage(1); }}>
-                                    <SelectTrigger className="w-45 rounded-xl border-gray-700 bg-gray-900/40">
+                                    <SelectTrigger className="w-45 rounded-xl border-gray-700 bg-gray-900/40 text-white">
                                         <SelectValue placeholder="Sort By" />
                                     </SelectTrigger>
                                     <SelectContent className="bg-[#1e293b] border-gray-700 text-white">
@@ -123,7 +142,7 @@ export default function AllProducts() {
                             </div>
                         </div>
 
-                        {/* products rendering */}
+                        {/* Products Render */}
                         {isLoading ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
                                 {[...Array(8)].map((_, i) => (
@@ -141,14 +160,21 @@ export default function AllProducts() {
                                         <ProductCard key={item._id} product={item} viewMode={viewMode} />
                                     ))
                                 ) : (
-                                    <div className="text-center py-20 border-2 border-dashed border-gray-800 rounded-3xl">
+                                    /* THE EMPTY Results */
+                                    <div className="text-center py-20 px-4 border-2 border-dashed border-gray-800 rounded-3xl">
                                         <p className="text-gray-500 font-bold uppercase tracking-widest">No matching items found.</p>
+                                        <button 
+                                            onClick={() => window.location.href = '/productdetails'}
+                                            className="mt-6 cursor-pointer text-sm bg-[#12bb9c] hover:bg-[#0fa388] text-white px-6 py-2 rounded-xl transition-all font-bold"
+                                        >
+                                            Reset Filters
+                                        </button>
                                     </div>
                                 )}
                             </div>
                         )}
 
-                        {/* pagination */}
+                        {/* Pagination */}
                         {!isLoading && metadata?.numberOfPages > 1 && (
                             <div className="mt-16 flex justify-center items-center gap-3">
                                 {[...Array(metadata.numberOfPages)].map((_, i) => (
