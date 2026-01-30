@@ -5,12 +5,13 @@ import Image from 'next/image';
 import { cartContext } from '@/context/CartContext';
 import toast from 'react-hot-toast';
 import { AiFillStar } from 'react-icons/ai';
-import { HiOutlineShoppingCart } from 'react-icons/hi';
+import { HiOutlineShoppingCart, HiOutlineEye } from 'react-icons/hi';
 import { ImSpinner2 } from 'react-icons/im';
 
-export default function ProductCard({ product, isBestSeller, Timer }) {
+export default function ProductCard({ product, isBestSeller, Timer, viewMode = 'grid' }) {
   const { addToCart, setIsCartOpen } = useContext(cartContext);
   const [isAdding, setIsAdding] = useState(false);
+  const isList = viewMode === 'list';
 
   async function handleAddToCart(id) {
     setIsAdding(true);
@@ -25,15 +26,21 @@ export default function ProductCard({ product, isBestSeller, Timer }) {
   }
 
   return (
-    <div className="relative w-full bg-white p-4 border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-all group h-full flex flex-col">
+    <div className={`relative w-full transition-all duration-300 group border border-gray-100 rounded-3xl overflow-hidden
+      ${isList 
+        ? 'flex flex-col md:flex-row items-center gap-8 p-6 bg-[#1e293b]/20 border-gray-700/50 hover:border-[#12bb9c]/50' 
+        : 'flex flex-col p-4 bg-white shadow-sm hover:shadow-md'}`}>
+      
       {isBestSeller && (
-        <div className="absolute top-2 left-2 z-10 bg-[#12bb9c] text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
+        <div className="absolute top-4 left-4 z-10 bg-[#12bb9c] text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
           Best Selling
         </div>
       )}
 
-      <Link href={`/productdetails/${product._id}`}>
-        <div className="relative h-60 w-full mb-4 overflow-hidden rounded-xl bg-gray-50">
+      {/* Image Section */}
+      <Link href={`/productdetails/${product._id}`} className={`shrink-0 ${isList ? 'w-full md:w-64' : 'w-full'}`}>
+        <div className={`relative overflow-hidden rounded-2xl bg-gray-50 transition-all
+          ${isList ? 'h-64' : 'h-60 mb-4'}`}>
           <Image 
             src={product.imageCover} 
             alt={product.title} 
@@ -43,9 +50,10 @@ export default function ProductCard({ product, isBestSeller, Timer }) {
         </div>
       </Link>
 
-      <div className="flex flex-col grow">
+      {/* Content Section */}
+      <div className={`flex flex-col grow ${isList ? 'text-left' : ''}`}>
         <div className="flex items-center space-x-2 mb-2">
-          <div className="flex items-center text-yellow-400">
+          <div className="flex items-center">
             {[...Array(5)].map((_, i) => (
               <AiFillStar 
                 key={i} 
@@ -54,31 +62,50 @@ export default function ProductCard({ product, isBestSeller, Timer }) {
             ))}
           </div>
           <span className="text-[10px] text-gray-400 font-bold">{product.ratingsAverage}</span>
+          {isList && <span className="text-[10px] text-gray-500">• {product.category?.name}</span>}
         </div>
 
         <Link href={`/productdetails/${product._id}`}>
-          <h5 className="text-sm font-bold text-[#001f3f] line-clamp-2 min-h-[40px] group-hover:text-[#12bb9c] transition-colors">
+          <h5 className={`font-bold transition-colors line-clamp-2
+            ${isList ? 'text-2xl text-white mb-4' : 'text-sm text-[#001f3f] min-h-[40px] group-hover:text-[#12bb9c]'}`}>
             {product.title}
           </h5>
         </Link>
 
-        <div className="mt-auto pt-4">
+        {isList && (
+          <p className="text-gray-400 text-sm mb-6 line-clamp-3 leading-relaxed max-w-2xl">
+            {product.description}
+          </p>
+        )}
+
+        <div className={`mt-auto ${isList ? 'flex flex-col gap-4' : 'pt-4'}`}>
           {Timer}
-          <div className="text-lg font-black text-[#001f3f] mb-3">EGP {product.price}</div>
-          <button 
-            disabled={isAdding}
-            onClick={() => handleAddToCart(product._id)}
-            className="cursor-pointer w-full bg-[#12bb9c] text-white py-2.5 rounded-xl text-xs font-bold hover:bg-[#0da085] transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
-          >
-            {isAdding ? (
-              <ImSpinner2 className="animate-spin text-sm" />
-            ) : (
-              <>
-                <HiOutlineShoppingCart className="text-sm" />
-                <span >Add to cart</span>
-              </>
+          <div className={`font-black ${isList ? 'text-3xl text-[#12bb9c]' : 'text-lg text-[#001f3f] mb-3'}`}>
+            {product.price} <span className="text-xs font-normal opacity-70">EGP</span>
+          </div>
+          
+          <div className={`flex items-center gap-3 ${isList ? 'justify-start' : 'justify-center'}`}>
+            <button 
+              disabled={isAdding}
+              onClick={() => handleAddToCart(product._id)}
+              className={`cursor-pointer bg-[#12bb9c] text-white rounded-xl font-bold hover:bg-[#0da085] transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50
+                ${isList ? 'px-8 py-3.5 text-sm' : 'w-full py-2.5 text-xs'}`}
+            >
+              {isAdding ? <ImSpinner2 className="animate-spin text-sm" /> : (
+                <>
+                  <HiOutlineShoppingCart className="text-sm" />
+                  <span>Add to cart</span>
+                </>
+              )}
+            </button>
+
+            {isList && (
+              <Link href={`/productdetails/${product._id}`} 
+                className="p-3.5 rounded-xl border border-gray-700 text-gray-400 hover:text-white hover:bg-gray-800 transition-all">
+                <HiOutlineEye size={20} />
+              </Link>
             )}
-          </button>
+          </div>
         </div>
       </div>
     </div>
