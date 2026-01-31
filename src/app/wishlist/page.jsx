@@ -8,6 +8,7 @@ import Skeleton from 'react-loading-skeleton';
 import toast from 'react-hot-toast';
 import { cartContext } from '@/context/CartContext';
 import 'react-loading-skeleton/dist/skeleton.css';
+import Cookies from 'js-cookie';
 
 export default function Wishlist() {
     const [wishlist, setWishlist] = useState([]);
@@ -15,14 +16,12 @@ export default function Wishlist() {
     const [isRemoving, setIsRemoving] = useState(null);
     const { addToCart, setIsCartOpen } = useContext(cartContext);
 
-    const headers = {
-        token: localStorage.getItem('userToken'),
-    };
+    
 
     // 1. Fetch Wishlist Data
     async function getWishlist() {
         try {
-            const { data } = await axios.get(`https://ecommerce.routemisr.com/api/v1/wishlist`, { headers });
+            const { data } = await axios.get(`https://ecommerce.routemisr.com/api/v1/wishlist`, { headers: getAuthHeaders() });
             setWishlist(data.data);
         } catch (error) {
             console.error("Error fetching wishlist:", error);
@@ -35,7 +34,7 @@ export default function Wishlist() {
     async function removeItem(id) {
         setIsRemoving(id);
         try {
-            const { data } = await axios.delete(`https://ecommerce.routemisr.com/api/v1/wishlist/${id}`, { headers });
+            const { data } = await axios.delete(`https://ecommerce.routemisr.com/api/v1/wishlist/${id}`, { headers: getAuthHeaders() });
             if (data.status === "success") {
                 toast.success("Removed from wishlist");
                 setWishlist(prev => prev.filter(item => item._id !== id));
@@ -57,6 +56,11 @@ export default function Wishlist() {
             setIsCartOpen(true);
         }
     }
+    // 4. Helper to get headers safely
+    const getAuthHeaders = () => {
+        const token = Cookies.get('userToken'); 
+        return { token };
+    };
 
     useEffect(() => {
         getWishlist();
