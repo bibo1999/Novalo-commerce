@@ -146,10 +146,10 @@ export default function ProductCard({ product, isBestSeller, Timer, viewMode = '
         )}
 
         <div className={`mt-auto ${isList ? 'flex flex-col gap-4' : 'pt-4'}`}>
-          {Timer}
           <div className={`font-black ${isList ? 'text-3xl text-[#12bb9c]' : 'text-lg text-[#001f3f] mb-3'}`}>
             {product.price} <span className="text-xs font-normal opacity-70">EGP</span>
           </div>
+          {Timer}
           
           <div className={`flex items-center gap-3 ${isList ? 'justify-start' : 'justify-center'}`}>
             <button 

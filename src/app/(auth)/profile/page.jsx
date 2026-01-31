@@ -7,6 +7,7 @@ import { jwtDecode } from 'jwt-decode';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation'; 
 import { useTheme } from '@/hooks/useTheme';
+import Cookies from 'js-cookie';
 
 export default function Profile() {
     
@@ -14,52 +15,40 @@ export default function Profile() {
     const [orders, setOrders] = useState([]);
     const [userName, setUserName] = useState('');
     const [isLoading, setIsLoading] = useState(true);
-    const router = useRouter(); // Initialize the router hook
+    const router = useRouter(); 
 
     useTheme("#0f172a", "MyProfile | Novalo");
 
     useEffect(() => {
-        // 1. Check if we are in the browser
         if (typeof window !== 'undefined') {
-            const localToken = localStorage.getItem('userToken');
-            
-            console.log("1. UseEffect Triggered. Context status:", !!userData, "Local status:", !!localToken);
+            const token = Cookies.get('userToken') || userData;
 
-            // 2. Only redirect if BOTH context and localStorage are empty
-            if (!userData && !localToken) {
-                 console.log("No token found anywhere. Redirecting to login...");
+            if (!token) {
                  router.push('/login');
-                 setIsLoading(false); 
                  return;
             }
 
-            // 3. Check and get the localToken if userData hasn't caught up yet
-            const tokenToUse = userData || localToken;
-
-            if (tokenToUse) {
-                try {
-                    const decoded = jwtDecode(tokenToUse);
-                    console.log("2. Token Decoded Successfully:", decoded);
-                    setUserName(decoded.name);
-                    fetchOrders(decoded.id);
-                } catch (error) {
-                    console.error("Error: Token decoding failed:", error);
-                    setIsLoading(false);
-                }
+            try {
+                const decoded = jwtDecode(token);
+                setUserName(decoded.name);
+                fetchOrders(decoded.id);
+            } catch (error) {
+                console.error("Token invalid:", error);
+                router.push('/login');
             }
         }
     }, [userData, router]);
 
     async function fetchOrders(id) {
-        console.log("3. Fetching orders for User ID:", id);
+        console.log("Fetching orders for User ID:", id);
         try {
             const { data } = await axios.get(`https://ecommerce.routemisr.com/api/v1/orders/user/${id}`);
-            console.log("4. Orders Data Received:", data);
+            console.log("Orders Data Received:", data);
             setOrders(data);
         } catch (err) {
             console.error("Error: Fetching orders failed:", err.response?.data || err.message);
         } finally {
-            console.log("5. Setting Loading to false");
+            console.log("Setting Loading to false");
             setIsLoading(false);
         }
     }
@@ -81,7 +70,7 @@ export default function Profile() {
                 <div>
                     <h1 className="text-2xl font-bold text-[#001f3f]">{userName}</h1>
                     <Link href="/forget-password" title="Security Settings" className="text-sm text-[#12bb9c] hover:underline">
-                        Change Security Settings
+                        Forget Your Password?
                     </Link>
                 </div>
             </div>

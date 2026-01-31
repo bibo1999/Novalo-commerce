@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 import { cartContext } from '@/context/CartContext';
 import 'react-loading-skeleton/dist/skeleton.css';
 import Cookies from 'js-cookie';
+import { useTheme } from '@/hooks/useTheme';
 
 export default function Wishlist() {
     const [wishlist, setWishlist] = useState([]);
@@ -16,7 +17,7 @@ export default function Wishlist() {
     const [isRemoving, setIsRemoving] = useState(null);
     const { addToCart, setIsCartOpen } = useContext(cartContext);
 
-    
+    useTheme("#0f172a", "MyWishlist | Novalo");
 
     // 1. Fetch Wishlist Data
     async function getWishlist() {

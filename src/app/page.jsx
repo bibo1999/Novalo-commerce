@@ -142,7 +142,7 @@ export default function Home() {
           <CategorySlider categories={categories} isLoading={isLoading} />
         </section>
 
-        {/* 3. DAILY BEST SELLS (Dynamic Swiper Logic) */}
+        {/* 3. DAILY BEST SELLS  */}
         <section className="py-16 animate-on-scroll">
           <div className="flex items-center justify-between mb-10">
             <h2 className="text-3xl md:text-4xl font-serif font-light text-[#001f3f] relative pb-3">
@@ -150,7 +150,7 @@ export default function Home() {
               <span className="absolute bottom-0 left-0 w-20 h-1 bg-[#12bb9c]"></span>
             </h2>
             
-            {/* Mobile Progress Indicator (Visible on mobile only) */}
+            {/* Mobile Progress Indicator */}
             <div className="flex md:hidden items-center gap-3">
               <span className="text-xs font-bold text-[#001f3f]">0{Math.min(activeIndex + 1, 4)}</span>
               <div className="w-16 h-0.5 bg-slate-200 relative overflow-hidden">
@@ -230,7 +230,7 @@ export default function Home() {
 
           {/* Mobile Dot Indicators */}
           <div className="flex lg:hidden justify-center items-center gap-2 mt-6">
-             {[0, 1, 2].map((i) => (
+             {[0, 1, 2, 3].map((i) => (
                <div key={i} className={`h-1.5 rounded-full transition-all duration-300 ${activeIndex === i ? 'w-8 bg-[#12bb9c]' : 'w-2 bg-slate-200'}`}></div>
              ))}
           </div>
