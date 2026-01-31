@@ -1,19 +1,18 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, Suspense } from 'react'; 
+import React, { useState, useEffect, useCallback } from 'react'; 
 import axios from 'axios';
-import { useSearchParams } from 'next/navigation'; 
 import { HiOutlineViewGrid, HiOutlineViewList, HiChevronRight } from "react-icons/hi";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import SidebarFilters from '@/components/Products/SidebarFilters';
 import ProductCard from '@/components/ProductCard/ProductCard';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
+import { useTheme } from '@/hooks/useTheme';
 
 
-function AllProductsContent() {
-    const searchParams = useSearchParams();
-    const subCategoryId = searchParams.get('sub');
+export default function AllProducts({ searchParams }) {
+    const subCategoryId = searchParams?.sub || null;
 
     const [viewMode, setViewMode] = useState('grid');
     const [products, setProducts] = useState([]);
@@ -52,13 +51,7 @@ function AllProductsContent() {
         fetchProducts();
     }, [fetchProducts]);
 
-    useEffect(() => {
-        const originalStyle = window.getComputedStyle(document.body).backgroundColor;
-        document.body.style.backgroundColor = "#0f172a";
-        return () => {
-            document.body.style.backgroundColor = originalStyle;
-        };
-    }, []);
+    useTheme("#0f172a",  "Novalo - All Products");
 
     const handleFilterApply = (filterData) => {
         setSelectedCategory(filterData.category);
@@ -196,18 +189,5 @@ function AllProductsContent() {
                 </div>
             </div>
         </div>
-    );
-}
-
-// 2. Export the component wrapped in Suspense
-export default function AllProducts() {
-    return (
-        <Suspense fallback={
-            <div className="bg-[#0f172a] min-h-screen pt-28 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#12bb9c]"></div>
-            </div>
-        }>
-            <AllProductsContent />
-        </Suspense>
     );
 }
