@@ -31,8 +31,7 @@ export default function Login() {
             if (res?.data?.message === 'success') {
                 const token = res?.data.token;
 
-                // 1. Set Cookie (Vital for Middleware)
-                // Added path: '/' to ensure it's available everywhere immediately
+                // 1. Cookie set config
                 Cookies.set('userToken', token, { 
                     expires: 7, 
                     secure: true, 
@@ -46,11 +45,10 @@ export default function Login() {
                 
                 toast.success("Welcome Back! 😍", { duration: 3000 });
                 
-                // 3. LOGIC CHANGE: 
-                // We use window.location.href instead of router.replace.
-                // This forces the browser to sync the cookie with the server.
+                
                 setTimeout(() => {
-                    window.location.href = '/'; 
+                    router.push('/'); 
+                    router.refresh(); 
                 }, 400); 
 
             } else {

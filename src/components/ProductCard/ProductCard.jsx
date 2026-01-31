@@ -3,15 +3,67 @@ import React, { useContext, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { cartContext } from '@/context/CartContext';
+import axios from 'axios';
 import toast from 'react-hot-toast';
-import { AiFillStar } from 'react-icons/ai';
 import { HiOutlineShoppingCart, HiOutlineEye } from 'react-icons/hi';
+import { AiFillStar, AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 import { ImSpinner2 } from 'react-icons/im';
 
 export default function ProductCard({ product, isBestSeller, Timer, viewMode = 'grid' }) {
   const { addToCart, setIsCartOpen } = useContext(cartContext);
   const [isAdding, setIsAdding] = useState(false);
   const isList = viewMode === 'list';
+  const [isWished, setIsWished] = useState(false);
+  const [wishLoading, setWishLoading] = useState(false);
+
+  // Wishlist
+  async function handleWishlist(id) {
+    if (wishLoading) return;
+    
+    const token = localStorage.getItem('userToken');
+    if (!token) {
+      toast.error("Please login first");
+      return;
+    }
+
+    setWishLoading(true);
+
+    try {
+      if (!isWished) {
+        // CASE: Add to wishlist
+        const { data } = await axios.post(
+          `https://ecommerce.routemisr.com/api/v1/wishlist`,
+          { productId: id },
+          { headers: { token } }
+        );
+        if (data.status === 'success') {
+          setIsWished(true);
+          toast.success("Added to wishlist", {
+            style: { border: '1px solid #12bb9c', color: '#12bb9c', background: '#0f172a' },
+            iconTheme: { primary: '#12bb9c', secondary: '#fff' },
+          });
+        }
+      } else {
+        // CASE: Remove from wishlist
+        const { data } = await axios.delete(
+          `https://ecommerce.routemisr.com/api/v1/wishlist/${id}`,
+          { headers: { token } }
+        );
+        if (data.status === 'success') {
+          setIsWished(false);
+          toast.success("Removed from wishlist", {
+            style: { border: '1px solid #ef4444', color: '#ef4444', background: '#0f172a' },
+            iconTheme: { primary: '#ef4444', secondary: '#fff' },
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Wishlist Error:", error);
+      toast.error('Something went wrong');
+    } finally {
+      setWishLoading(false);
+    }
+  }
 
   async function handleAddToCart(id) {
     setIsAdding(true);
@@ -37,6 +89,21 @@ export default function ProductCard({ product, isBestSeller, Timer, viewMode = '
         </div>
       )}
 
+      {/* Wishlist Button */}
+      {!isList && (
+        <button 
+          onClick={() => handleWishlist(product._id)}
+          className="absolute top-4 right-4 z-10 p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-sm hover:bg-white transition-all cursor-pointer group/wish"
+        >
+          {wishLoading ? (
+            <ImSpinner2 className="animate-spin text-gray-400 text-sm" />
+          ) : isWished ? (
+            <AiFillHeart className="text-red-500 text-lg" />
+          ) : (
+            <AiOutlineHeart className="text-gray-400 group-hover/wish:text-red-500 text-lg transition-colors" />
+          )}
+        </button>
+      )}
       {/* Image Section */}
       <Link href={`/productdetails/${product._id}`} className={`shrink-0 ${isList ? 'w-full md:w-64' : 'w-full'}`}>
         <div className={`relative overflow-hidden rounded-2xl bg-gray-50 transition-all

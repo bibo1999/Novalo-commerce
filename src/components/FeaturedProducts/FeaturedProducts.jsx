@@ -32,7 +32,7 @@ export default function FeaturedProducts({ products, isLoading }) {
     }
   }, [emblaApi, products, onSelect]);
 
-  /* ---------------- SKELETON ---------------- */
+  /*  SKELETON  */
   if (isLoading) {
     return (
       <div className="flex gap-6 py-4">

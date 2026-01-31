@@ -119,7 +119,7 @@ export default function Home() {
     <main className="bg-[#f9f8f4] min-h-screen overflow-x-hidden">
       
       {/* 1. HERO BANNER */}
-      <section className="pt-20 md:pt-28 pb-6 animate-on-scroll">
+      <section className="pt-28 md:pt-28 pb-6 animate-on-scroll">
         <div className="max-w-screen-xl mx-auto px-4 md:px-6">
           <div className="relative overflow-hidden rounded-3xl shadow-sm border border-slate-100 bg-white">
             <div className="aspect-video md:aspect-21/9 w-full">
@@ -183,7 +183,7 @@ export default function Home() {
             className="flex lg:grid lg:grid-cols-4 gap-6 overflow-x-auto lg:overflow-visible pb-8 lg:pb-0 snap-x snap-mandatory no-scrollbar"
           >
             {/* Promo Card */}
-            <div className="relative shrink-0 w-[85%] lg:w-full snap-center rounded-3xl overflow-hidden bg-[#001f3f] p-8 min-h-[450px] flex flex-col justify-end group">
+            <div className="relative shrink-0 w-[85%] lg:w-full snap-center rounded-3xl overflow-hidden bg-[#001f3f] p-8 min-h-112.5 flex flex-col justify-end group">
               {featuredCategory?.image && (
                 <Image src={featuredCategory.image} alt="promo" fill className="object-cover opacity-40 transition-transform duration-700 group-hover:scale-105" />
               )}
@@ -191,7 +191,7 @@ export default function Home() {
                 <span className="text-[#12bb9c] font-bold text-xs uppercase tracking-widest">Today's Deals</span>
                 <h3 className="text-3xl font-bold text-white mb-4 mt-2">{featuredCategory?.name}</h3>
                 <Link 
-                  href={`/products?category=${featuredCategory?._id}`} 
+                  href={`/categories/${featuredCategory?._id}`} 
                   className="inline-flex items-center gap-2 bg-[#12bb9c] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#0da085] transition-all"
                 >
                   Shop Now <HiOutlineArrowNarrowRight />

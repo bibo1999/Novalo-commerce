@@ -34,17 +34,7 @@ export default function Checkout() {
     const [paymentMethod, setPaymentMethod] = useState('online');
     const router = useRouter();
 
-    useEffect(() => {
-        document.title = "Checkout | Novalo";
-    }, []);
-
-    useEffect(() => {
-    const originalStyle = window.getComputedStyle(document.body).backgroundColor;
-    document.body.style.backgroundColor = "#0f172a";
-    return () => {
-        document.body.style.backgroundColor = originalStyle;
-    };
-}, []);
+    useTheme("#0f172a", "Checkout | Novalo");
 
     async function handleOrderSubmit(values) {
         setIsLoading(true);

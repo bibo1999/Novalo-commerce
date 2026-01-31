@@ -1,28 +1,66 @@
 'use client';
 
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useRouter } from 'next/navigation';
 import { authenticationContext } from '@/context/UserContext';
 import Link from 'next/link';
+import toast from 'react-hot-toast';
+import Cookies from 'js-cookie';
 
 export default function Register() {
-    let { registerApi } = useContext(authenticationContext);
+    let { registerApi, setUserData, userData } = useContext(authenticationContext);
     const [isLoading, setIsLoading] = useState(false);
     const [messageError, setMessageError] = useState('');
     let router = useRouter();
 
+    // 1. Redirect if already logged in (Sync with Login logic)
+    useEffect(() => {
+        if (userData || Cookies.get('userToken')) {
+            router.replace('/');
+        }
+    }, [userData, router]);
+
     async function handleRegister(values) {
         setIsLoading(true);
-        let res = await registerApi(values);
-        if (res?.data?.message === 'success') {
-            router.push('/login');
-        } else {
-            const errorMsg = res?.response?.data?.message || "Registration failed";
-            setMessageError(errorMsg);
+        setMessageError('');
+        
+        try {
+            let res = await registerApi(values);
+            
+            if (res?.data?.message === 'success') {
+                const token = res?.data.token;
+
+                // 2. Set Cookie (Matches Login logic for Middleware compatibility)
+                Cookies.set('userToken', token, { 
+                    expires: 7, 
+                    secure: true, 
+                    sameSite: 'strict',
+                    path: '/' 
+                });
+                
+                // 3. Set LocalStorage and Context
+                localStorage.setItem('userToken', token);
+                setUserData(token); 
+                
+                toast.success("Account Created Successfully! 🎉", { duration: 3000 });
+
+                // 4. Force hard reload to sync cookie with Server Components/Middleware
+                setTimeout(() => {
+                    window.location.href = '/'; 
+                }, 400); 
+
+            } else {
+                const errorMsg = res?.response?.data?.message || "Registration failed";
+                setMessageError(errorMsg);
+                toast.error(errorMsg);
+            }
+        } catch (error) {
+            setMessageError("Something went wrong. Please try again.");
+        } finally {
+            setIsLoading(false);
         }
-        setIsLoading(false);
     }
 
     let validation = Yup.object({
@@ -68,10 +106,10 @@ export default function Register() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-12">
+        <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-24">
             <form 
                 onSubmit={formik.handleSubmit} 
-                className="max-w-md w-full bg-white border border-gray-200 rounded-2xl p-8 shadow-xl space-y-6"
+                className="max-w-md w-full bg-white border border-gray-200 rounded-3xl p-10 shadow-2xl space-y-8"
             >
                 <div className="text-center">
                     <h2 className="text-3xl font-bold text-[#001f3f]">Create Account</h2>
@@ -79,8 +117,9 @@ export default function Register() {
                 </div>
 
                 {messageError && (
-                    <div className="bg-red-50 border-l-4 border-red-600 text-red-700 p-3 rounded text-sm font-bold animate-shake">
-                        {messageError}
+                    <div className="flex items-center bg-red-50 border-l-4 border-red-600 text-red-700 p-4 rounded-xl animate-pulse">
+                         <i className="fa-solid fa-circle-exclamation mr-3"></i>
+                        <p className="text-sm font-bold">{messageError}</p>
                     </div>
                 )}
 
@@ -95,14 +134,18 @@ export default function Register() {
                 <button 
                     disabled={isLoading} 
                     type="submit" 
-                    className={`cursor-pointer w-full py-3 rounded-xl text-white font-bold transition-all duration-300 shadow-lg
+                    className={`cursor-pointer w-full py-4 rounded-2xl text-white font-bold text-sm transition-all duration-300 shadow-xl
                         ${isLoading ? 'bg-gray-400' : 'bg-[#12bb9c] hover:opacity-90 active:scale-95 shadow-[#12bb9c]/20'}`}
                 >
-                    {isLoading ? <i className='fas fa-spinner fa-spin'></i> : "Register Now"}
+                    {isLoading ? (
+                        <span className="flex items-center justify-center gap-2">
+                             <i className='fas fa-circle-notch fa-spin'></i> Registering...
+                        </span>
+                    ) : "Register Now"}
                 </button>
 
                 <p className="text-center text-sm text-gray-600">
-                    Already have an account? <Link href="/login" className="text-[#001f3f] font-bold no-underline hover:underline">Login</Link>
+                    Already have an account? <Link href="/login" className="text-[#001f3f] font-bold hover:underline ml-1">Login</Link>
                 </p>
             </form>
         </div>

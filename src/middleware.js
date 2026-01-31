@@ -4,7 +4,8 @@ export function middleware(request) {
   const token = request.cookies.get('userToken')?.value;
   const { pathname } = request.nextUrl;
 
-  const isPublicRoute = pathname === '/login' || pathname === '/register';
+  const publicRoutes = ['/login', '/register', '/forget-password', '/verify-code', '/reset-password'];
+  const isPublicRoute = publicRoutes.includes(pathname);
 
   // 1. If trying to access protected route without token
   if (!token && !isPublicRoute) {

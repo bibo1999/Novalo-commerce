@@ -11,22 +11,24 @@ import {
 } from "react-icons/hi";
 import { MdOutlineDeliveryDining, MdOutlineReceiptLong } from "react-icons/md";
 import Loader from "@/components/Loader/Loader";
+import { useTheme } from "@/hooks/useTheme";
 
 export default function AllOrders() {
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const originalStyle = window.getComputedStyle(
-      document.body,
-    ).backgroundColor;
-    document.body.style.backgroundColor = "#0f172a";
-    document.title = "Order History | Novalo";
+  useTheme("#0f172a", "MyOrders | Novalo");
+  // useEffect(() => {
+  //   const originalStyle = window.getComputedStyle(
+  //     document.body,
+  //   ).backgroundColor;
+  //   document.body.style.backgroundColor = "#0f172a";
+  //   document.title = "Order History | Novalo";
 
-    return () => {
-      document.body.style.backgroundColor = originalStyle;
-    };
-  }, []);
+  //   return () => {
+  //     document.body.style.backgroundColor = originalStyle;
+  //   };
+  // }, []);
 
   // Fetch User Orders
   async function getUserOrders() {

@@ -16,7 +16,8 @@ export default function ForgetPassword() {
             const { data } = await axios.post('https://ecommerce.routemisr.com/api/v1/auth/forgotPasswords', { email });
             if (data.statusMsg === 'success') {
                 toast.success(data.message);
-                router.push('/verify-code'); 
+                router.push('/verify-code');
+                router.refresh(); 
             }
         } catch (err) {
             toast.error(err.response?.data?.message || "Error occurred");
@@ -38,7 +39,7 @@ export default function ForgetPassword() {
                 />
                 <button 
                     disabled={loading}
-                    className="w-full py-3 bg-[#12bb9c] text-white rounded-xl font-bold hover:opacity-90 transition-all"
+                    className="cursor-pointer w-full py-3 bg-[#12bb9c] text-white rounded-xl font-bold hover:opacity-90 transition-all"
                 >
                     {loading ? <i className="fas fa-spinner fa-spin"></i> : "Send Verification Code"}
                 </button>

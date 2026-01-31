@@ -6,6 +6,7 @@ import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation'; 
+import { useTheme } from '@/hooks/useTheme';
 
 export default function Profile() {
     
@@ -14,6 +15,8 @@ export default function Profile() {
     const [userName, setUserName] = useState('');
     const [isLoading, setIsLoading] = useState(true);
     const router = useRouter(); // Initialize the router hook
+
+    useTheme("#0f172a", "MyProfile | Novalo");
 
     useEffect(() => {
         // 1. Check if we are in the browser

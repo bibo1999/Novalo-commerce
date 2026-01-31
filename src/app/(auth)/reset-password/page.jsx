@@ -24,6 +24,7 @@ export default function ResetPassword() {
                 toast.success("Password Updated! Logging you in...");
                 localStorage.setItem('userToken', data.token);
                 router.push('/login');
+                router.refresh();
             }
         } catch (err) {
             toast.error(err.response?.data?.message || "Reset failed");
@@ -59,7 +60,7 @@ export default function ResetPassword() {
 
                 <button 
                     disabled={loading}
-                    className="w-full py-3 bg-[#12bb9c] text-white rounded-xl font-bold hover:opacity-90 shadow-lg shadow-[#12bb9c]/20 transition-all"
+                    className="cursor-pointer w-full py-3 bg-[#12bb9c] text-white rounded-xl font-bold hover:opacity-90 shadow-lg shadow-[#12bb9c]/20 transition-all"
                 >
                     {loading ? <i className="fas fa-spinner fa-spin"></i> : "Complete Reset"}
                 </button>

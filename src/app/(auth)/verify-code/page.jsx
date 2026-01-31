@@ -16,7 +16,8 @@ export default function VerifyCode() {
             const { data } = await axios.post('https://ecommerce.routemisr.com/api/v1/auth/verifyResetCode', { resetCode });
             if (data.status === 'Success') {
                 toast.success("Code Verified!");
-                router.push('/reset-password'); // Move to final step
+                router.push('/reset-password');
+                router.refresh();
             }
         } catch (err) {
             toast.error(err.response?.data?.message || "Invalid Code");
@@ -39,7 +40,7 @@ export default function VerifyCode() {
                 />
                 <button 
                     disabled={loading}
-                    className="w-full py-3 bg-[#001f3f] text-white rounded-xl font-bold hover:bg-[#002d5c]"
+                    className="cursor-pointer w-full py-3 bg-[#001f3f] text-white rounded-xl font-bold hover:bg-[#002d5c]"
                 >
                     {loading ? <i className="fas fa-spinner fa-spin"></i> : "Verify Code"}
                 </button>
