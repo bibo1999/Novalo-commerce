@@ -12,10 +12,11 @@ import Cookies from 'js-cookie';
 export default function Register() {
     let { registerApi, setUserData, userData } = useContext(authenticationContext);
     const [isLoading, setIsLoading] = useState(false);
+    const [isSuccess, setIsSuccess] = useState(false); 
     const [messageError, setMessageError] = useState('');
     let router = useRouter();
 
-    // 1. Redirect if already logged in (Sync with Login logic)
+    // Redirect if already logged in
     useEffect(() => {
         if (userData || Cookies.get('userToken')) {
             router.replace('/');
@@ -32,24 +33,24 @@ export default function Register() {
             if (res?.data?.message === 'success') {
                 const token = res?.data.token;
 
-                // 2. Set Cookie (Matches Login logic for Middleware compatibility)
+                // 1. Sync Authentication
                 Cookies.set('userToken', token, { 
                     expires: 7, 
                     secure: true, 
                     sameSite: 'strict',
                     path: '/' 
                 });
-                
-                // 3. Set LocalStorage and Context
                 localStorage.setItem('userToken', token);
                 setUserData(token); 
                 
-                toast.success("Account Created Successfully! 🎉", { duration: 3000 });
+                // 2. Show Success toast
+                setIsSuccess(true);
+                toast.success("Account Created Successfully! 🎉");
 
-                // 4. Force hard reload to sync cookie with Server Components/Middleware
+                // 3. SPA Redirection 
                 setTimeout(() => {
-                    window.location.href = '/'; 
-                }, 400); 
+                    router.push('/'); 
+                }, 2500); 
 
             } else {
                 const errorMsg = res?.response?.data?.message || "Registration failed";
@@ -107,47 +108,66 @@ export default function Register() {
 
     return (
         <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-24">
-            <form 
-                onSubmit={formik.handleSubmit} 
-                className="max-w-md w-full bg-white border border-gray-200 rounded-3xl p-10 shadow-2xl space-y-8"
-            >
-                <div className="text-center">
-                    <h2 className="text-3xl font-bold text-[#001f3f]">Create Account</h2>
-                    <p className="mt-2 text-sm text-gray-500 font-medium">Join us today</p>
-                </div>
-
-                {messageError && (
-                    <div className="flex items-center bg-red-50 border-l-4 border-red-600 text-red-700 p-4 rounded-xl animate-pulse">
-                         <i className="fa-solid fa-circle-exclamation mr-3"></i>
-                        <p className="text-sm font-bold">{messageError}</p>
+            <div className="max-w-md w-full bg-white border border-gray-200 rounded-3xl p-10 shadow-2xl transition-all duration-500">
+                
+                {isSuccess ? (
+                    /* Success Loading State */
+                    <div className="text-center py-10 animate-in fade-in zoom-in duration-700">
+                        <div className="mb-6 relative inline-block">
+                             {/* Branded Spinner without a button wrapper */}
+                             <div className="w-20 h-20 border-4 border-[#12bb9c]/20 border-t-[#12bb9c] rounded-full animate-spin mx-auto shadow-[0_0_15px_rgba(18,187,156,0.2)]"></div>
+                             <i className="fa-solid fa-check text-[#12bb9c] text-3xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></i>
+                        </div>
+                        <h2 className="text-3xl font-black text-[#001f3f] mb-2">Welcome!</h2>
+                        <p className="text-gray-500 font-medium px-4">You have registered successfully. We are preparing your account...</p>
+                        <div className="mt-8 flex items-center justify-center gap-2 text-[#12bb9c] font-bold text-sm tracking-widest uppercase">
+                            <span className="w-2 h-2 bg-[#12bb9c] rounded-full animate-bounce"></span>
+                            <span className="w-2 h-2 bg-[#12bb9c] rounded-full animate-bounce [animation-delay:0.2s]"></span>
+                            <span className="w-2 h-2 bg-[#12bb9c] rounded-full animate-bounce [animation-delay:0.4s]"></span>
+                        </div>
                     </div>
+                ) : (
+                    /* Registration Form */
+                    <form onSubmit={formik.handleSubmit} className="space-y-8">
+                        <div className="text-center">
+                            <h2 className="text-3xl font-bold text-[#001f3f]">Create Account</h2>
+                            <p className="mt-2 text-sm text-gray-500 font-medium">Join us today</p>
+                        </div>
+
+                        {messageError && (
+                            <div className="flex items-center bg-red-50 border-l-4 border-red-600 text-red-700 p-4 rounded-xl animate-pulse">
+                                <i className="fa-solid fa-circle-exclamation mr-3"></i>
+                                <p className="text-sm font-bold">{messageError}</p>
+                            </div>
+                        )}
+
+                        <div className="space-y-5">
+                            {renderInput("name", "Full Name")}
+                            {renderInput("email", "Email Address", "email")}
+                            {renderInput("phone", "Phone Number", "tel")}
+                            {renderInput("password", "Password", "password")}
+                            {renderInput("rePassword", "Confirm Password", "password")}
+                        </div>
+
+                        <button 
+                            disabled={isLoading} 
+                            type="submit" 
+                            className={`cursor-pointer w-full py-4 rounded-2xl text-white font-bold text-sm transition-all duration-300 shadow-xl
+                                ${isLoading ? 'bg-gray-400' : 'bg-[#12bb9c] hover:opacity-90 active:scale-95 shadow-[#12bb9c]/20'}`}
+                        >
+                            {isLoading ? (
+                                <span className="flex items-center justify-center gap-2">
+                                     <i className='fas fa-circle-notch fa-spin'></i> Registering...
+                                </span>
+                            ) : "Register Now"}
+                        </button>
+
+                        <p className="text-center text-sm text-gray-600">
+                            Already have an account? <Link href="/login" className="text-[#001f3f] font-bold hover:underline ml-1">Login</Link>
+                        </p>
+                    </form>
                 )}
-
-                <div className="space-y-5">
-                    {renderInput("name", "Full Name")}
-                    {renderInput("email", "Email Address", "email")}
-                    {renderInput("phone", "Phone Number", "tel")}
-                    {renderInput("password", "Password", "password")}
-                    {renderInput("rePassword", "Confirm Password", "password")}
-                </div>
-
-                <button 
-                    disabled={isLoading} 
-                    type="submit" 
-                    className={`cursor-pointer w-full py-4 rounded-2xl text-white font-bold text-sm transition-all duration-300 shadow-xl
-                        ${isLoading ? 'bg-gray-400' : 'bg-[#12bb9c] hover:opacity-90 active:scale-95 shadow-[#12bb9c]/20'}`}
-                >
-                    {isLoading ? (
-                        <span className="flex items-center justify-center gap-2">
-                             <i className='fas fa-circle-notch fa-spin'></i> Registering...
-                        </span>
-                    ) : "Register Now"}
-                </button>
-
-                <p className="text-center text-sm text-gray-600">
-                    Already have an account? <Link href="/login" className="text-[#001f3f] font-bold hover:underline ml-1">Login</Link>
-                </p>
-            </form>
+            </div>
         </div>
     );
 }
