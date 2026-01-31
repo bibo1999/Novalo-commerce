@@ -6,6 +6,7 @@ import { cartContext } from '@/context/CartContext';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
+import { useTheme } from '@/hooks/useTheme';
 
 
 
